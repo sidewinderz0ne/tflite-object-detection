@@ -212,9 +212,12 @@ cd C:\TensorFlow\scripts\preprocessing
 
 Once you are in the correct directory, run these two commands to generate the records
 
+Train records:
 ```
 python generate_tfrecord.py -x C:\Tensorflow\workspace\training_demo\images\train -l C:\Tensorflow\workspace\training_demo\annotations\label_map.pbtxt -o C:\Tensorflow\workspace\training_demo\annotations\train.record
-
+```
+Test records:
+```
 python generate_tfrecord.py -x C:\Tensorflow\workspace\training_demo\images\test -l C:\Tensorflow\workspace\training_demo\annotations\label_map.pbtxt -o C:\Tensorflow\workspace\training_demo\annotations\test.record
 ```
  After each command you should get a success message stating that the TFRecord File has been created. So now under ```annotations``` there should be a ```test.record``` and ```train.record```. That means we have generated all the data necessary, and we can proceed to configure the training pipeline in the next step
@@ -272,6 +275,10 @@ cd C:\TensorFlow\workspace\training_demo
 
 I have already moved the training script in to the directory, so to run it just use 
 
+```
+python model_main_tf2.py --model_dir=models\fpnlite640 --pipeline_config_path=models\fpnlite640\pipeline.config
+```
+Original one:
 ```
 python model_main_tf2.py --model_dir=models\my_ssd_mobilenet_v2_fpnlite --pipeline_config_path=models\my_ssd_mobilenet_v2_fpnlite\pipeline.config
 ```
@@ -437,6 +444,10 @@ cd C:\TensorFlow\workspace\training_demo
 ```
 Now, unlike my other guide, we aren't using ```exporter_main_v2.py``` to export the model. For TensorFlow Lite Models, we have to use ```export_tflite_graph_tf2.py```. You can export the model with
 ```
+python export_tflite_graph_tf2.py --pipeline_config_path models\fpnlite640\pipeline.config --trained_checkpoint_dir models\fpnlite640 --output_directory exported-models\fpnlite640
+```
+Original one:
+```
 python export_tflite_graph_tf2.py --pipeline_config_path models\my_ssd_mobilenet_v2_fpnlite\pipeline.config --trained_checkpoint_dir models\my_ssd_mobilenet_v2_fpnlite --output_directory exported-models\my_tflite_model
 ```
 **Note: At the moment, TensorFlow Lite only support models with the SSD Architecture (excluding EfficientDet). Make sure that you have trained with an SSD training pipeline before you continue. You can take a look at the [TensorFlow Model Zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md) or the [documentation](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/running_on_mobile_tf2.md) for the most up-to-date information.**
@@ -505,6 +516,10 @@ optional arguments:
 
 At the moment I'd recommend not using the output argument and sticking to the default values as it still has a few errors. Enough talking, to convert the model run
 ```
+python convert-to-tflite.py --model exported-models\fpnlite640\saved_model --output write_metadataOriginal one:
+```
+Original one:
+```
 python convert-to-tflite.py
 ```
 
@@ -550,24 +565,6 @@ There you go, you're all set to run object detection on the Pi! Good Luck!
 
 #ADDING METADA FOR ANDROID
 ```
-from tflite_support.metadata_writers import object_detector
-from tflite_support.metadata_writers import writer_utils
-from tflite_support import metadata
-
-ObjectDetectorWriter = object_detector.MetadataWriter
-_MODEL_PATH = "exported-models\my_tflite_model\model.tflite"
-_LABEL_FILE = "write_metadata\labelmap.txt"
-_SAVE_TO_PATH = "write_metadata\detect.tflite"
-
-writer = ObjectDetectorWriter.create_for_inference(
-    writer_utils.load_file(_MODEL_PATH), [127.5], [127.5], [_LABEL_FILE])
-writer_utils.save_file(writer.populate(), _SAVE_TO_PATH)
-
-# Verify the populated metadata and associated files.
-displayer = metadata.MetadataDisplayer.with_model_file(_SAVE_TO_PATH)
-print("Metadata populated:")
-print(displayer.get_metadata_json())
-print("Associated file(s) populated:")
-print(displayer.get_packed_associated_file_list())
+python write_metadata.py
 ```
 
