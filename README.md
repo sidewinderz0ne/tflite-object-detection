@@ -516,7 +516,7 @@ optional arguments:
 
 At the moment I'd recommend not using the output argument and sticking to the default values as it still has a few errors. Enough talking, to convert the model run
 ```
-python convert-to-tflite.py --model exported-models\fpnlite640\saved_model --output write_metadataOriginal one:
+python convert-to-tflite.py --model exported-models\fpnlite640\saved_model --output write_metadata:
 ```
 Original one:
 ```
